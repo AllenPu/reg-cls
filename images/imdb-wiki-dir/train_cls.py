@@ -12,6 +12,8 @@ from scipy.stats import gmean
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
 from torch.utils.data import DataLoader
+# 
+from loss_elr import ELR_reg
 
 # from tensorboard_logger import Logger
 
@@ -296,7 +298,11 @@ def main():
         cls_num=args.cls_num,  # To estimate accuracy
         split="test",
     )
-
+    #
+    total_len_train = len(train_dataset)
+    #
+    num_classes = train_dataset.nclasses
+    #
     # Define the data loaders over the datasets
     train_loader = DataLoader(
         train_dataset,
@@ -463,6 +469,7 @@ def main():
             losstype=args.losstype,
             cls_num=args.cls_num,
             erlambda=args.erlambda,
+            total_len = total_len_train
         )
 
         # Evaluate the model on the validation set
@@ -518,7 +525,7 @@ def main():
     )
 
 
-def train(train_loader, model, optimizer, epoch, losstype, cls_num, erlambda):
+def train(train_loader, model, optimizer, epoch, losstype, cls_num, erlambda, total_len):
     """The main training loop, passing 1x over the training data.
     Args:
         - train_loader: the dataloader of the training set
@@ -528,6 +535,7 @@ def train(train_loader, model, optimizer, epoch, losstype, cls_num, erlambda):
         - losstype: 'mse' or 'msecls' (if we use a classification head)
         - cls_num: the number of classes in the classification head
         - erlambda: the weight for the loss in the reg+cls
+        - total_len : total length of the train dataset
     """
 
     batch_time = AverageMeter("Time", ":6.2f")
@@ -537,7 +545,8 @@ def train(train_loader, model, optimizer, epoch, losstype, cls_num, erlambda):
     # Define the classification loss
     cls_loss_criterion = None
     if losstype.startswith("msecls") and cls_num > 0:
-        cls_loss_criterion = torch.nn.CrossEntropyLoss(ignore_index=-1)
+        #cls_loss_criterion = torch.nn.CrossEntropyLoss(ignore_index=-1)
+        cls_loss_criterion = ELR_reg(total_len, cls_num)
         accuracies = AverageMeter("Accuracy", ":.3f")
         losses_cls = AverageMeter("Loss-cls", ":.3f")
         progress = ProgressMeter(
@@ -556,7 +565,7 @@ def train(train_loader, model, optimizer, epoch, losstype, cls_num, erlambda):
     end = time.time()
 
     # Loop over all training samples ------------------------------------------------------
-    for idx, (inputs, targets, labels, weights) in enumerate(train_loader):
+    for idx, (inputs, targets, labels, weights, index) in enumerate(train_loader):
         data_time.update(time.time() - end)
         inputs, targets, labels, weights = (
             inputs.cuda(non_blocking=True),

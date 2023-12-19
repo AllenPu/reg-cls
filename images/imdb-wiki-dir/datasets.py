@@ -50,7 +50,7 @@ class IMDBWIKI(data.Dataset):
             else np.asarray([np.float32(1.0)])
         )
 
-        return img, label, cls_label, weight
+        return img, label, cls_label, weight, index
 
     def cls_data_stats(self, args, split, minval=0.0, maxval=100.0, plot=True):
         """Get the class data statistics.
