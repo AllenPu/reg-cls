@@ -13,7 +13,7 @@ class ELR_reg(torch.nn.Module):
         self.beta = beta
         self.lamb = lamb
 
-    def forward(self, index, outputs, targets):
+    def forward(self, index, inputs, targets):
         y_pred = torch.nn.functional.softmax(outputs, dim=1)
         y_pred = torch.clamp(y_pred, 1e-4, 1.0 - 1e-4)
         y_pred_ = y_pred.data.detach()
@@ -21,5 +21,5 @@ class ELR_reg(torch.nn.Module):
         #ce_loss = torch.nn.functional.cross_entropy(outputs, targets, ignore_index=-1)
         elr_reg = ((1 - (self.ema[index] * y_pred).sum(dim=1)).log()).mean()
         final_loss = self.lamb * elr_reg #+ ce_loss
-        print(f' elr loss is {elr_reg.item()}')
+        # print(f' elr loss is {elr_reg.item()}')
         return final_loss
