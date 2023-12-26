@@ -14,7 +14,7 @@ class ELR_reg(torch.nn.Module):
         self.lamb = lamb
 
     def forward(self, index, inputs, targets):
-        y_pred = torch.nn.functional.softmax(outputs, dim=1)
+        y_pred = torch.nn.functional.softmax(inputs, dim=1)
         y_pred = torch.clamp(y_pred, 1e-4, 1.0 - 1e-4)
         y_pred_ = y_pred.data.detach()
         self.ema[index] = self.beta * self.ema[index] + (1 - self.beta) * ((y_pred_) / (y_pred_).sum(dim=1, keepdim=True))
