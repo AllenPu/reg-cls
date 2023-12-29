@@ -637,7 +637,7 @@ def train(train_loader, model, optimizer, epoch, losstype, cls_num, erlambda, to
         ###########################
         if args.ce:
             ce_loss = torch.nn.functional.cross_entropy(outputs_cls, labels, ignore_index=-1)
-            totalloss = args.celambda * ce_loss
+            totalloss += args.celambda * ce_loss
 
         # Normalize the loss to accumulate gradients
         totalloss = totalloss / float(args.batch_acu)
