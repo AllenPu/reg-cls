@@ -479,7 +479,8 @@ def main():
             losstype=args.losstype,
             cls_num=args.cls_num,
             erlambda=args.erlambda,
-            total_len = total_len_train
+            total_len = total_len_train,
+            args=args
         )
 
         # Evaluate the model on the validation set
