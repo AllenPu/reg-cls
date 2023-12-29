@@ -52,7 +52,7 @@ parser.add_argument(
 # newly added
 ####################
 parser.add_argument(
-    "--ce", type=bool, default=False, help="use ce loss weight or not."
+    "--ce", action='store_true', help="use ce loss weight or not."
 )
 parser.add_argument(
     "--celambda", type=float, default=0, help="weight of the ce loss weight."
