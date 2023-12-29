@@ -49,6 +49,9 @@ parser.add_argument(
     "--erlambda", type=float, default=1.0, help="Regression loss weight."
 )
 parser.add_argument(
+    "--celambda", type=float, default=1.0, help="ce loss weight."
+)
+parser.add_argument(
     "--losstype",
     type=str,
     default="mse",
