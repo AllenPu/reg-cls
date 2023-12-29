@@ -18,8 +18,8 @@ class ELR_reg(torch.nn.Module):
         y_pred = torch.clamp(y_pred, 1e-4, 1.0 - 1e-4)
         y_pred_ = y_pred.data.detach()
         self.ema[index] = self.beta * self.ema[index] + (1 - self.beta) * ((y_pred_) / (y_pred_).sum(dim=1, keepdim=True))
-        ce_loss = torch.nn.functional.cross_entropy(outputs, targets, ignore_index=-1)
+        #ce_loss = torch.nn.functional.cross_entropy(outputs, targets, ignore_index=-1)
         elr_reg = ((1 - (self.ema[index] * y_pred).sum(dim=1)).log()).mean()
-        final_loss = self.lamb * elr_reg + ce_loss
+        final_loss = self.lamb * elr_reg
         # print(f' elr loss is {elr_reg.item()}')
         return final_loss

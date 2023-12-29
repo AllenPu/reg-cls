@@ -48,9 +48,16 @@ parser.add_argument(
 parser.add_argument(
     "--erlambda", type=float, default=1.0, help="Regression loss weight."
 )
+####################
+# newly added
+####################
 parser.add_argument(
-    "--celambda", type=float, default=1.0, help="ce loss weight."
+    "--ce", type=bool, default=False, help="use ce loss weight or not."
 )
+parser.add_argument(
+    "--celambda", type=float, default=0, help="weight of the ce loss weight."
+)
+#####################
 parser.add_argument(
     "--losstype",
     type=str,
@@ -528,7 +535,7 @@ def main():
     )
 
 
-def train(train_loader, model, optimizer, epoch, losstype, cls_num, erlambda, total_len):
+def train(train_loader, model, optimizer, epoch, losstype, cls_num, erlambda, total_len, args = 0):
     """The main training loop, passing 1x over the training data.
     Args:
         - train_loader: the dataloader of the training set
@@ -623,6 +630,13 @@ def train(train_loader, model, optimizer, epoch, losstype, cls_num, erlambda, to
                 totalloss = loss + loss_cls / erlambda
         else:
             totalloss = loss
+
+        ###########################
+        #
+        ###########################
+        if args.ce:
+            ce_loss = torch.nn.functional.cross_entropy(outputs_cls, labels, ignore_index=-1)
+            totalloss = args.celambda * ce_loss
 
         # Normalize the loss to accumulate gradients
         totalloss = totalloss / float(args.batch_acu)
