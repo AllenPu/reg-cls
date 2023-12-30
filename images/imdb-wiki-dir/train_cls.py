@@ -616,7 +616,7 @@ def train(train_loader, model, optimizer, epoch, losstype, cls_num, erlambda, to
             outputs_cls = outputs_cls[labels != -1]
             labels = labels[labels != -1]
 
-            loss_cls = cls_loss_criterion(index = index, inputs=outputs_cls, targets=labels)
+            loss_cls = cls_loss_criterion(index = index, outputs=outputs_cls, targets=labels)
 
             keep_size = labels[labels != -1].size()[0]
             if keep_size > 0:
