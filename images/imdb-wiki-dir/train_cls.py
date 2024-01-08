@@ -57,6 +57,10 @@ parser.add_argument(
 parser.add_argument(
     "--celambda", type=float, default=0, help="weight of the ce loss weight."
 )
+parser.add_argument(
+    "--beta", type=float, default=0.7, help="the momentum for ELR target probability."
+)
+
 #####################
 parser.add_argument(
     "--losstype",
@@ -557,7 +561,7 @@ def train(train_loader, model, optimizer, epoch, losstype, cls_num, erlambda, to
     cls_loss_criterion = None
     if losstype.startswith("msecls") and cls_num > 0:
         #cls_loss_criterion = torch.nn.CrossEntropyLoss(ignore_index=-1)
-        cls_loss_criterion = ELR_reg(total_len, cls_num)
+        cls_loss_criterion = ELR_reg(total_len, cls_num, args.beta)
         accuracies = AverageMeter("Accuracy", ":.3f")
         losses_cls = AverageMeter("Loss-cls", ":.3f")
         progress = ProgressMeter(
